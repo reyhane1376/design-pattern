@@ -239,3 +239,135 @@ public function register()
     $this->app->bind(abstract: FormUIFactory::class, concrete: BootstrapFormUiFactory::class);
 }
 ```
+
+# Builder 
+
+Builder is a creational design pattern that lets you construct complex objects step by step. The pattern allows you to produce different types and representations of an object using the same construction code.
+
+![alt text](image-2.png)
+
+## Application
+
+Use the Builder pattern to get rid of a "telescopic constructor".
+Use the Builder pattern when you want your code to be able to create different representations of some product.   
+Use the Builder to construct Composite trees or other complex objects.
+
+```php
+namespace Src\RequestBuilder;
+
+class Request
+{
+    private $url;
+    private $data;
+    private $method;
+    private $headers;
+    private $agent;
+
+    public function __construct(RequestBuilder $builder)
+    {
+        $this->uri = $builder->getUri();
+        $this->method = $builder->getMethod();
+        $this->data = $builder->getData();
+        $this->headers = $builder->getHeaders();
+        $this->agent = $builder->getAgent();
+    }
+
+    public function run()
+    {
+        $request = curl_init($this->uri);
+
+        // ... rest of the implementation ...
+
+        return null;
+    }
+}
+```
+
+```php
+namespace Src\RequestBuilder;
+
+class RequestBuilder
+{
+    private $uri;
+    private $data;
+    private $method;
+    private $headers;
+    private $agent;
+
+    /**
+     * @var Request
+     */
+    private $request;
+
+    public static function forge(): RequestBuilder
+    {
+        return new RequestBuilder();
+    }
+
+    public function withUri(string $uri): RequestBuilder
+    {
+        $this->uri = $uri;
+        return $this;
+    }
+
+    public function withData(array $data): RequestBuilder
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    public function withHeaders(array $headers): RequestBuilder
+    {
+        $this->headers = $headers;
+
+        return $this;
+    }
+
+    public function withAgent(string $agent): RequestBuilder
+    {
+        $this->agent = $agent;
+
+        return $this;
+    }
+
+    public function withMethod(string $method): RequestBuilder
+    {
+        $this->method = $method;
+
+        return $this;
+    }
+
+    public function getUri()
+    {
+        return $this->uri;
+    }
+
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
+    public function getAgents()
+    {
+        return $this->agents;
+    }
+
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    public function build(): Request
+    {
+        return new Request($this);
+    }
+
+
+}
+```

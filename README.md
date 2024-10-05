@@ -371,3 +371,211 @@ class RequestBuilder
 
 }
 ```
+
+```php
+namespace Src\RequestBuilder;
+
+class ApiService
+{
+    public function fetchUsers()
+    {
+        $request = RequestBuilder::forge()
+            ->withUri(uri: 'https://api-service.com/users')
+            ->withMethod(method: 'GET')
+            ->withData([
+                'user_name' => 'some_user_name',
+                'password' => 'some_password'
+            ])
+            ->build();
+
+            $response = $request->run();
+    }
+}
+```
+# Adapter 
+
+Adapter is a structural design pattern that allows objects with incompatible interfaces to collaborate.
+
+![alt text](image-3.png)
+
+## Application
+
+### Use the Adapter class when you want to use some existing class, but its interface isn't compatible with the rest of your code
+
+### Use the pattern when you want to reuse several existing subclasses that lack some common functionality that can't be added to the superclass.
+
+```php
+namespace Src\PaymentProvider;
+
+class Invoice
+{
+    private $amount;
+
+    /**
+     * @param $amount
+     */
+    public function __construct($amount)
+    {
+        $this->amount = $amount;
+    }
+
+    public function amount(): int
+    {
+        return $this->amount;
+    }
+}
+```
+
+```php
+namespace Src\PaymentProvider;
+
+interface OnlineGateway
+{
+    public function startPay(Invoice $invoice): void;
+}
+```
+
+```php
+namespace Src\PaymentProvider;
+
+class ZarnipalProvider implements OnlineGateway
+{
+    public function startPay(Invoice $invoice): void
+    {
+        // TODO: Implement startPay() method.
+    }
+}
+```
+```php
+namespace Src\PaymentProvider;
+
+class SamanBankGateway
+{
+    private $apiKey;
+
+    /**
+     * @param $apiKey
+     */
+    public function __construct($apiKey)
+    {
+        $this->apiKey = $apiKey;
+    }
+
+    public function pay(int $amount): void
+    {
+        // ...
+    }
+}
+```
+
+```php 
+namespace Src\PaymentProvider;
+
+class SamanGatewayAdapter implements OnlineGateway
+{
+    private $samanApi;
+
+    /**
+     * @param SamanBankGateway $samanApi
+     */
+    public function __construct(SamanBankGateway $samanApi)
+    {
+        $this->samanApi = $samanApi;
+    }
+
+    public function startPay(Invoice $invoice): void
+    {
+        $this->samanApi->pay($invoice->amount());
+    }
+}
+```
+
+# Bridge 
+
+Bridge is a structural design pattern that lets you split a large class or a set of closely related classes into two separate hierarchies—abstraction and implementation—which can be developed independently of each other.
+
+![alt text](image-4.png)
+
+## Application
+
+### Use the Bridge pattern when you want to divide and organize a monolithic class that has several variants of some functionality (for example, if the class can work with various database servers)
+
+### Use the pattern when you need to extend a class in several orthogonal (independent) dimensions.
+
+### Use the Bridge if you need to be able to switch implementations at runtime
+
+
+```php
+namespace Src\PaymentModule;
+
+abstract class PaymentMethod
+{
+    private $handler;
+
+    /**
+     * @param PaymentHandler $handler
+     */
+    public function __construct(PaymentHandler $handler)
+    {
+        $this->handler = $handler;
+    }
+
+    abstract public function startPay(Invoice $invoice);
+}
+```
+
+```php
+namespace Src\PaymentModule;
+
+interface PaymentHandler
+{
+    public function pay(Invoice $invoice);
+}
+```
+
+```php
+
+class OnlinePayment extends PaymentMethod
+{
+    private $connection;
+
+    /**
+     * @param Connection $connection
+     */
+    public function __construct(Connection $connection, PaymentHandler $handler)
+    {
+        parent::__construct($handler);
+        $this->connection = $connection;
+    }
+
+    public function startPay(Invoice $invoice)
+    {
+        // $this->connection->insert("INSERT INTO payments");
+        $this->handler->pay($invoice);
+    }
+}
+```
+```php
+namespace Src\PaymentModule\Handlers;
+
+use Src\PaymentModule\Invoice;
+use Src\PaymentModule\PaymentHandler;
+
+class SayyadChequeHandler implements PaymentHandler
+{
+    public function pay(Invoice $invoice)
+    {
+        // TODO: Implement pay() method.
+    }
+}
+```
+
+```php
+public function register()
+{
+    $this->app->bind(OnlinePayment::class, function ($app) {
+        $connection = resolve(ConnectionFactory::class);
+        return new OnlinePayment($connection->make('mysql'), new SayyadChequeHandler());
+    });
+}
+```

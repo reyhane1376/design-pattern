@@ -579,3 +579,73 @@ public function register()
     });
 }
 ```
+# Composite
+
+Composite is a structural design pattern that lets you compose objects into tree structures and then work with these structures as if they were individual objects.
+
+![alt text](image-5.png)
+
+## Application
+
+### Use the Composite pattern when you have to implement a tree-like object structure.
+
+### Use the pattern when you want the client code to treat both simple and complex elements uniformly.
+
+```php
+namespace Src\Concept;
+
+interface Component
+{
+    public function operation();
+}
+```
+
+```php
+namespace Src\Concept;
+
+class Leaf implements Component
+{
+    public function operation()
+    {
+        // TODO: Implement operation() method.
+    }
+}
+```
+
+```php
+namespace Src\Concept;
+
+class Composite implements Component
+{
+    private $components = [];
+
+    public function addComponent(Component $component)
+    {
+        $this->components[] = $component;
+    }
+
+    public function operation()
+    {
+        foreach ($this->components as $component) {
+            $component->operation();
+        }
+    }
+}
+```
+
+```php
+namespace Src\Concept;
+
+class Client
+{
+    private $component;
+
+    /**
+     * @param Component $component
+     */
+    public function __construct(Component $component)
+    {
+        $this->component = $component;
+    }
+}
+```

@@ -649,3 +649,85 @@ class Client
     }
 }
 ```
+# Decorator
+
+Decorator is a structural design pattern that lets you attach new behaviors to objects by placing these objects inside special wrapper objects that contain the behaviors..
+
+![alt text](image-6.png)
+
+## Application
+
+### Use the Decorator pattern when you need to be able to assign extra behaviors to objects at runtime without breaking the code that uses these objects.  
+
+### Use the pattern when it's awkward or not possible to extend an object's behavior using inheritance
+
+```php
+namespace Src\InvoicePrice;
+
+interface InvoicePrice {
+    public function price(): int;
+}
+```
+```php
+namespace Src\InvoicePrice;
+
+class Invoice implements InvoicePrice {
+    public function price(): int {
+        return 1000000;
+    }
+}
+```
+
+```php
+namespace Src\InvoicePrice;
+
+class InvoiceDecorator implements InvoicePrice {
+    private $invoicePrice;
+
+    /**
+     * @param InvoicePrice $invoicePrice
+     */
+    public function __construct(InvoicePrice $invoicePrice) {
+        $this->invoicePrice = $invoicePrice;
+    }
+
+    public function price(): int {
+        return $this->invoicePrice->price();
+    }
+}
+```
+
+```php
+namespace Src\InvoicePrice;
+
+class VATInvoicePrice extends InvoiceDecorator {
+    public function price(): int {
+        return parent::price() - (parent::price() * 0.09);
+    }
+}
+```
+```php
+namespace Src\InvoicePrice;
+
+class ServiceInvoicePricePrice extends InvoicePriceDecorator {
+    public function price(): int {
+        return parent::price() + 35000;
+    }
+}
+
+```
+
+```php
+namespace Src\InvoicePrice;
+
+class InvoiceService {
+    public function calculatePrice(): int {
+        $invoice = new Invoice();
+        $serviceInvoicePrice = new ServiceInvoicePricePrice($invoice);
+        $vatInvoicePrice = new VATInvoicePricePrice($serviceInvoicePrice);
+        return $vatInvoicePrice->price();
+    }
+}
+```
+
+

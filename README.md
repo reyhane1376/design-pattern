@@ -729,5 +729,89 @@ class InvoiceService {
     }
 }
 ```
+# Facade
+
+Facade is a structural design pattern that provides a simplified interface to a library, a framework, or any other complex set of classes.
+
+![alt text](image-7.png)
+
+## Application
+
+### Use the Facade pattern when you need to have a limited but straightforward interface to a complex subsystem.
+
+### Use the Facade when you want to structure a subsystem into layers.
+
+```php
+namespace Src\OrderService;
+
+class QuantityService {
+    public function exist(Product $product): bool {
+        return true;
+    }
+}
+```
+```php
+namespace Src\OrderService;
+
+class DiscountService {
+    private function isValid(string $coupon): bool {
+        return true;
+    }
+
+    public function apply(string $coupon): int {
+        if (!$this->isValid($coupon)) {
+            throw new RuntimeException(message: 'این کد تخفیف معتبر نمی باشد');
+        }
+
+        return 500000;
+    }
+}
+```
+```php
+namespace Src\OrderService;
+
+class OrderService {
+    private $quantityService;
+    private $discountService;
+
+    public function __construct(QuantityService $quantityService, DiscountService $discountService) {
+        $this->quantityService = $quantityService;
+        $this->discountService = $discountService;
+    }
+
+    public function register(Basket $basket) {
+        // check quantity
+        foreach ($basket->items() as $product) {
+            $result = $this->quantityService->exist($product);
+        }
+
+        // discount apply
+        $amount = $this->discountService->apply($basket->coupon());
+
+        // register order
+        $order = Order::create(userId: 1, $amount, [], $basket->coupon());
+    }
+}
+```
+
+```php
+namespace Src\OrderService;
+
+class Basket {
+    private $items;
+
+    public function add(Product $product) {
+        $this->items[] = $product;
+    }
+
+    public function coupon(): string {
+        return '5645465987asda';
+    }
+
+    public function items() {
+        return $this->items;
+    }
+}
+```
 
 

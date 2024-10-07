@@ -991,6 +991,119 @@ class CachedProductRepository implements ProductRepositoryInterface {
 }
 ```
 
+# Chain of Responsibility
+
+Chain of Responsibility is a behavioral design pattern that lets you pass requests along a chain of handlers. Upon receiving a request, each handler decides either to process the request or to pass it to the next handler in the chain.
+
+![alt text](image-10.png)
+
+## Application
+
+### Use the Chain of Responsibility pattern when your program is expected to process different kinds of requests in various ways, but the exact types of requests and their sequences are unknown beforehand.   
+### Use the pattern when it's essential to execute several handlers in a particular order.
+
+### Use the CoR pattern when the set of handlers and their order are supposed to change at runtime.
+
+```php
+namespace Src\RegistrationService;
+
+final class RegistrationRequest {
+    private $emailAddress;
+    private $password;
+    private $referralCode;
+
+    public function __construct($emailAddress, $password, $referralCode) {
+        $this->emailAddress = $emailAddress;
+        $this->password = $password;
+        $this->referralCode = $referralCode;
+    }
+
+    //getters
+
+}
+```
+
+```php
+namespace Src\RegistrationService;
+
+abstract class Checker {
+    private $nextChecker;
+    public function __construct(Checker $nextChecker = null) {
+        $this->nextChecker = $nextChecker;
+    }
+
+    public function check(RegistrationRequest $request):bool {
+        if (!$this->nextChecker) {
+            return true;
+        }
+
+        return $this->nextChecker->check($request);
+    }
+}
+```
+
+```php
+class UserEmailChecker extends Checker {
+    public function check(RegistrationRequest $request):bool {
+        if ($this->emailExists($request->getEmailAddress())) {
+            return false;
+        }
+
+        return parent::check($request); 
+    }
+
+    private function emailExists(string $emailAddress): bool {
+        return User::query()->where(column: 'email', $emailAddress)->count() > 0;
+    }
+}
+```
+
+```php
+class UserPasswordChecker extends Checker {
+    public function check(RegistrationRequest $request): bool {
+        if (!$this->isPasswordValid($request->getPassword())) {
+            return false;
+        }
+
+        return parent::check($request);
+    }
+
+    private function isPasswordValid(string $password): bool {
+        return true;
+    }
+}
+```
+
+```php
+class ReferralChecker extends Checker {
+    public function check(RegistrationRequest $request): bool {
+        if (!$this->isReferralValid($request->getReferralCode())) {
+            return false;
+        }
+
+        return parent::check($request);
+    }
+
+    private function isReferralValid(string $referral): bool {
+        return Referral::query()->where(column: 'code', $referral)->count() > 0;
+    }
+}
+```
+
+```php
+class RegistrationService {
+    public function register(RegistrationRequest $request) {
+        return $this->checkerChain()->check($request);
+    }
+
+    private function checkerChain(): Checker {
+        $referralChecker = new ReferralChecker();
+        $passwordChecker = new UserPasswordChecker($referralChecker);
+        return new UserEmailChecker($passwordChecker);
+    }
+}
+```
+
 
 
 

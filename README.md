@@ -814,4 +814,127 @@ class Basket {
 }
 ```
 
+# Flyweight
+
+Flyweight is a structural design pattern that lets you fit more objects into the available amount of RAM by sharing common parts of state between multiple objects instead of keeping all of the data in each object.
+
+![alt text](image-8.png)
+
+## Application
+
+### Use the Flyweight pattern only when your program must support a huge number of objects which barely fit into available RAM.
+
+```php
+namespace Src\DiscountGenerator;
+
+class Discount {
+    private $code;
+    private $userId = 0;
+    private $constraints;
+
+    public function __construct(string $code, int $userId, DiscountConstraints $constraints) {
+        $this->code = $code;
+        $this->userId = $userId;
+        $this->constraints = $constraints;
+    }
+}
+```
+
+```php
+namespace Src\DiscountGenerator;
+
+class DiscountConstraints {
+    private $expirationDate;
+    private $limit;
+    private $minAmount = 0;
+    private $maxAmount;
+    private $percent;
+
+    public function __construct($expirationDate, $limit, int $minAmount, $maxAmount, $percent) {
+    $this->expirationDate = $expirationDate;
+    $this->limit = $limit;
+    $this->minAmount = $minAmount;
+    $this->maxAmount = $maxAmount;
+    $this->percent = $percent;
+}
+}
+```
+
+```php
+namespace Src\DiscountGenerator;
+
+class DiscountFactory {
+    private $constraints = [];
+    private $discounts = [];
+    public function createDiscount(
+        string $code,
+        int $userId,
+        \DateTimeImmutable $expirationDate,
+        int $limit,
+        int $minAmount,
+        int $maxAmount,
+        int $percent
+    ):Discount {
+        $constraint = $this->createConstraint($expirationDate, $limit, $minAmount, $maxAmount, $percent);
+
+        $discount = new Discount($code, $userId, $constraint);
+        $this->discounts[] = $discount;
+
+        return $discount;
+    }
+
+    private function createConstraint(\DateTimeImmutable $expirationDate, int $limit, int $minAmount, int $maxAmount, int $percent): DiscountConstraints {
+    $key = $this->createKey(get_defined_vars());
+
+    if (!isset($this->constraints[$key])) {
+        $this->constraints[$key] = new DiscountConstraints($expirationDate, $limit, $minAmount, $maxAmount, $percent);
+    }
+
+        return $this->constraints[$key];
+    }
+
+    private function createKey(array $data): string {
+        ksort($data);
+
+        return md5(implode(separator: '', $data));
+    }
+}
+```
+
+```php
+namespace Src\DiscountGenerator;
+
+class Client {
+    private $discountFactory;
+    public function __construct(DiscountFactory $discountFactory) {
+        $this->discountFactory = $discountFactory;
+    }
+
+    public function createDiscounts() {
+
+        foreach (range(start: 1, end: 100000) as $counter) {
+            $dateRange = mt_rand(1, 5);
+            $limitRange = mt_rand(1, 3);
+
+            $minRange = [0, 10000, 20000];
+            $maxRange = [100000, 200000, 500000];
+
+            $percentRange = mt_rand(15, 35);
+
+            $this->discountFactory->createDiscount(
+                Str::random(length: 10),
+                userId: 0,
+                \DateTimeImmutable::createFromMutable(new DateTime(datetime: "+ {$dateRange} day")),
+                $limitRange,
+                array_rand($minRange),
+                array_rand($maxRange),
+                $percentRange
+            );
+        }
+    }
+}
+```
+
+
+
 

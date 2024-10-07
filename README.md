@@ -934,6 +934,62 @@ class Client {
     }
 }
 ```
+# Proxy
+
+Proxy is a structural design pattern that lets you provide a substitute or placeholder for another object. A proxy controls access to the original object, allowing you to perform something either before or after the request gets through to the original object.
+
+![alt text](image-9.png)
+
+## Application
+
+### Lazy initialization (virtual proxy): This is when you have a heavyweight service object that wastes system resources by being always up, even though you only need it from time to time.  
+
+### Caching request results (caching proxy): This is when you need to cache results of client requests and manage the life cycle of this cache, especially if results are quite large.
+
+```php
+<?php
+
+namespace Src\CachedRepository;
+
+interface ProductRepositoryInterface {
+    public function all();
+}
+```
+
+```php
+namespace Src\CachedRepository;
+
+class EloquentProductRepository implements ProductRepositoryInterface {
+    public function all() {
+        // TODO: Implement all() method.
+    }
+}
+```
+
+```php
+namespace Src\CachedRepository;
+
+class CachedProductRepository implements ProductRepositoryInterface {
+    private $productRepository;
+    private $cache;
+
+    public function __construct(ProductRepositoryInterface $eloquentProductRepository, Repository $cache) {
+        $this->productRepository = $eloquentProductRepository;
+        $this->cache = $cache;
+    }
+
+    public function all() {
+        $result = $this->cache->get(key: 'products.all');
+
+        if (is_null($result)) {
+            $result = $this->productRepository->all();
+            $this->cache->set(key: 'products.all', $result);
+        }
+
+        return $result;
+    }
+}
+```
 
 
 

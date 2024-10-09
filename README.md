@@ -1103,6 +1103,92 @@ class RegistrationService {
     }
 }
 ```
+# Strategy
+
+Strategy is a behavioral design pattern that lets you define a family of algorithms, put each of them into a separate class, and make their objects interchangeable.
+
+![alt text](image-11.png)
+
+## Application
+
+### Use the Strategy pattern when you want to use different variants of an algorithm within an object and be able to switch from one algorithm to another during runtime.   
+
+### Use the Strategy when you have a lot of similar classes that only differ in the way they execute some behavior.   
+
+### Use the pattern to isolate the business logic of a class from the implementation details of algorithms that may not be as important in the context of that logic.
+
+```php
+namespace Src\Payment;
+
+interface PaymentMethod {
+    public function doPayment(Order $order);
+}
+```
+
+```php
+namespace Src\Payment;
+
+class PaymentService {
+    /** @var PaymentMethod */
+    private $paymentMethod;
+
+    public function setPaymentMethod(PaymentMethod $method) {
+        $this->paymentMethod = $method;
+    }
+
+    public function pay(Order $order) {
+        $this->paymentMethod->doPayment($order);
+    }
+}
+```
+
+```php
+namespace Src\Payment;
+
+class CashPayment implements PaymentMethod {
+    public function doPayment(Order $order) {
+        // TODO: Implement doPayment() method.
+    }
+}
+```
+
+```php
+namespace Src\Payment;
+
+class ChequePayment implements PaymentMethod {
+    public function doPayment(Order $order) {
+        // TODO: Implement doPayment() method.
+    }
+}
+```
+
+```php
+class PaymentsController extends Controller {
+    public function startPayment(Request $request) {
+        $order = new Order(price: 1250000);
+        $paymentService = new PaymentService();
+        $paymentService->setPaymentMethod($this->makePaymentMethod($request->get('payment_method')));
+        $paymentService->pay($order);
+    }
+
+    private function makePaymentMethod(string $method) {
+    switch ($method) {
+        case 'cash':
+            return new CashPayment();
+            break;
+        case 'online':
+            return new OnlinePayment();
+            break;
+        case 'cheque':
+            return new ChequePayment();
+            break;
+        default:
+            throw new RuntimeException(message: 'روش پرداخت معتبر نمی باشد');
+            break;
+    }
+    }
+}
+```
 
 
 

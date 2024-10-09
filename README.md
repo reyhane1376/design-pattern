@@ -1190,6 +1190,73 @@ class PaymentsController extends Controller {
 }
 ```
 
+# Observer
+
+Observer is a behavioral design pattern that lets you define a subscription mechanism to notify multiple objects about any events that happen to the object they're observing
+
+![alt text](image-12.png)
+
+## Application
+
+### Use the Observer pattern when changes to the state of one object may require changing other objects, and the actual set of objects is unknown beforehand or changes dynamically.   
+
+### Use the pattern when some objects in your app must observe others, but only for a limited time or in specific cases.
+
+```php
+namespace Src\Product;
+
+class Product implements \SplSubject {
+    private $price;
+    private $observers;
+    public function __construct($price) {
+        $this->price = $price;
+        $this->observers = new \SplObjectStorage();
+    }
+
+    public function changePrice(int $newPrice):void {
+        if ($this->price == $newPrice) {
+            return;
+        }
+        $this->price = $newPrice;
+        $this->notify();
+    }
+
+    public function attach(SplObserver $observer):void {
+        $this->observers->attach($observer);
+    }
+
+    public function detach(SplObserver $observer):void {
+        $this->observers->detach($observer);
+    }
+
+    public function notify() {
+        foreach ($this->observers as $observer) {
+            $observer->update($this);
+        }
+    }
+
+    public function attachPriceObservers() {
+    $this->attach(new ProductOfferProductPriceObserver());
+    }
+    public function price() {
+        return $this->price;
+    }
+}
+```
+```php
+namespace Src\Product\Observers;
+
+use SplSubject;
+
+class ProductOfferProductPriceObserver implements \SplObserver {
+    public function update(SplSubject $subject) {
+    $productNewPrice = $subject->price();
+    // UPDATE product_offers SET price=$newPrice WHERE product_id=$subject->id()
+    }
+}
+```
+
+
 
 
 

@@ -1529,6 +1529,91 @@ interface UndoableCommand extends Command {
 }
 ```
 
+# Mediator
+
+Mediator is a behavioral design pattern that lets you reduce chaotic dependencies between objects. The pattern restricts direct communications between the objects and forces them to collaborate only via a mediator object.
+
+![alt text](image-16.png)
+
+## Application
+
+### Use the Mediator pattern when it's hard to change some of the classes because they are tightly coupled to a bunch of other classes.
+
+### Use the pattern when you can't reuse a component in a different program because it's too dependent on other components
+
+```php
+namespace Src\EventDispatcher;
+
+interface Observer {
+    public function update(string $event, object $emitter, $data = null);
+}
+
+```
+
+```php
+namespace Src\EventDispatcher;
+
+class EventDispatcher {
+    private $observers = [];
+
+    public function attach(string $event, Observer $observer):void {
+        $this->initEventGroup($event);
+        $this->observers[$event][] = $observer;
+    }
+
+    public function detach(string $event, Observer $observer) {
+    foreach ($this->getEventObservers($event) as $key => $observerItem) {
+        if ($observer === $observerItem) {
+            unset($this->observers[$event][$key]);
+        }
+    }
+    }
+
+    private function initEventGroup(string $event) {
+        if(!isset($this->observers[$event])) {
+            $this->observers[$event] = [];
+        }
+    }
+
+    private function getEventObservers(string $event) {
+    $this->initEventGroup($event);
+    return $this->observers[$event];
+    }
+
+    public function fire(string $event, object $emitter, $data = null) {
+    foreach ($this->getEventObservers($event) as $observer) {
+        $observer->update($event, $emitter, $data);
+    }
+}
+}
+```
+
+```php
+namespace Src\EventDispatcher;
+
+class UserService {
+    private $eventDispatcher;
+    public function __construct(EventDispatcher $eventDispatcher) {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    public function deleteUser(int $userId):void {
+        $this->eventDispatcher->fire(event: 'user:deleted', $this, [
+            'userId' => $userId
+        ]);
+    }
+}
+```
+
+```php
+public function register() {
+    $eventDispatcher = new EventDispatcher();
+    $eventDispatcher->attach(event: 'user:deleted', new Logger());
+    $this->app->singleton(abstract: EventDispatcher::class, $eventDispatcher);
+}
+```
+
+
 
     
 

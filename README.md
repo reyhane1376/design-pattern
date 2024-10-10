@@ -1255,6 +1255,136 @@ class ProductOfferProductPriceObserver implements \SplObserver {
     }
 }
 ```
+# State
+
+State is a behavioral design pattern that lets an object alter its behavior when its internal state changes. It appears as if the object changed its class.
+
+![alt text](image-13.png)
+
+## Application
+
+### Use the State pattern when you have an object that behaves differently depending on its current state, the number of states is enormous, and the state-specific code changes frequently.   
+
+### Use the pattern when you have a class polluted with massive conditionals that alter how the class behaves according to the current values of the class's fields.
+
+### Use State when you have a lot of duplicate code across similar states and transitions of a condition-based state machine.
+
+```php
+class Post {
+    private $title;
+    private $content;
+    private $status;
+    public function __construct(string $title, string $content, PostStatus $status) {
+        $this->title = $title;
+        $this->content = $content;
+        $this->transitionTo(new DraftStatus());
+    }
+
+    public function transitionTo(PostStatus $status) {
+    $this->status = $status;
+    $this->status->setPost($this);
+    }
+
+    public function draft() {
+        $this->status->draft();
+    }
+
+    public function moderation() {
+        $this->status->moderation();
+    }
+
+    public function publish()
+    {
+        $this->status->published();
+    }
+}
+```
+```php
+namespace Src\CRM;
+
+abstract class PostStatus {
+    protected $post;
+
+    public function setPost(Post $post) {
+        $this->post = $post;
+    }
+
+    abstract public function draft();
+    abstract public function moderation();
+    abstract public function published();
+}
+```
+
+```php
+namespace Src\CRM\PostStatuses;
+
+use Src\CRM\PostStatus;
+
+class DraftStatus extends PostStatus {
+    public function draft() {
+        $this->post->transitionTo(new DraftStatus());
+    }
+
+    public function moderation() {
+        $this->post->transitionTo(new ModerationStatus());
+    }
+
+    public function published() {
+        throw new InvalidStateException(message: 'مطلب از حالت پیش نویس نمی تواند منتشر شود');
+    }
+}
+```
+
+```php
+namespace Src\CRM\PostStatuses;
+
+use Src\CRM\PostStatus;
+
+class ModerationStatus extends PostStatus {
+    public function draft() {
+        $this->post->transitionTo(new DraftStatus());
+    }
+
+    public function moderation() {
+        $this->post->transitionTo(new ModerationStatus());
+    }
+
+    public function published() {
+        $this->post->transitionTo(new PublishedStatus());
+    }
+}
+```
+
+```php
+namespace Src\CRM\PostStatuses;
+
+use Src\CRM\PostStatus;
+
+class PublishedStatus extends PostStatus {
+    public function draft() {
+        $this->post->transitionTo(new DraftStatus());
+    }
+
+    public function moderation() {
+        throw new InvalidStateException(message: 'مطلب منتشر شده نمی تواند وارد صف بررسی شود');
+    }
+
+    public function published() {
+        throw new InvalidStateException(message: 'مطلبی که منتشر شده است نمی تواند دوباره منتشر شود');
+    }
+}
+```
+
+```php
+namespace Src\CRM;
+
+class Client {
+    public function publishPost() {
+        $post = new Post(title: 'sample title', content: 'sample content');
+        $post->moderation();
+    }
+}
+```
 
 
 

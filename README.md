@@ -1453,6 +1453,83 @@ class Client {
     }
 }
 ```
+# command
+
+Command is a behavioral design pattern that turns a request into a stand-alone object that contains all information about the request. This transformation lets you parameterize methods with different requests, delay or queue a request's execution, and support undoable operations.
+
+![alt text](image-15.png)
+
+## Application
+
+### Use the Command pattern when you want to parametrize objects with operations.
+
+### Use the Command pattern when you want to queue operations, schedule their execution, or execute them remotely.
+
+### Use the Command pattern when you want to implement reversible operations
+
+```php
+namespace Src\Tasks;
+
+interface Command {
+    public function execute();
+}
+```
+
+```php
+namespace Src\Tasks;
+
+class AddTaskCommand implements Command {
+    private $title;
+    private $content;
+    private $addTaskHandler;
+    public function __construct($title, $content, AddTaskHandler $addTaskHandler) {
+        $this->title = $title;
+        $this->content = $content;
+        $this->addTaskHandler = $addTaskHandler;
+    }
+
+    public function execute() {
+        $this->addTaskHandler->execute($this);
+    }
+}
+```
+
+```php
+namespace Src\Tasks;
+
+class AddTaskHandler {
+    public function execute(AddTaskCommand $add_task_command) {
+    }
+}
+```
+
+```php
+namespace Src\Tasks;
+
+use Illuminate\Http\Request;
+
+class TasksController {
+    public function add(Request $request) {
+        $addTaskHandler = new AddTaskHandler();
+        $addTaskCommand = new AddTaskCommand(
+            $request->get(key: 'title'),
+            $request->get(key: 'content'),
+            $addTaskHandler
+        );
+        $addTaskHandler->execute($addTaskCommand);
+    }
+}
+```
+
+```php
+namespace Src\Tasks;
+
+interface UndoableCommand extends Command {
+    public function undo();
+}
+```
+
+
     
 
 

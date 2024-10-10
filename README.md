@@ -1385,6 +1385,75 @@ class Client {
     }
 }
 ```
+# Template Method
+
+Template Method is a behavioral design pattern that defines the skeleton of an algorithm in the superclass but lets subclasses override specific steps of the algorithm without changing its structure.
+
+![alt text](image-14.png)
+
+## Application
+
+### Use the Template Method pattern when you want to let clients extend only particular steps of an algorithm, but not the whole algorithm or its structure.   
+
+### Use the pattern when you have several classes that contain almost identical algorithms with some minor differences. As a result, you might need to modify both classes when the algorithm changes
+
+```php
+abstract class UserReport {
+
+    public function generate(Collection $users) {
+        $result = $this->prepare($user);
+        $this->export($result);
+    }
+
+    private function prepare(Collection $users) {
+        return $this->users->filter(function($user) {
+            return $user->age > 18;
+        });
+    }
+
+    abstract protected function export(Collection $users);
+}
+```
+```php
+namespace Src\ReportExporter;
+
+use Illuminate\Database\Eloquent\Collection;
+
+class UserReportInPDF extends UserReport {
+
+    protected function export(Collection $users) {
+        //export data to pdf
+        // $this->dataToExport;
+    }
+}
+```
+```php
+
+namespace Src\ReportExporter;
+
+class UserReportInWord extends UserReport {
+    protected function export(Collection $users) {
+        // export data in word
+    }
+}
+```
+```php
+namespace Src\ReportExporter;
+
+class Client {
+    private $reporter;
+    public function __construct(UserReport $reporter) {
+        $this->reporter = $reporter;
+    }
+
+    public function exportUsers(string $keyword) {
+        $this->reporter->generate(User::query()
+                                    ->where('first_name', 'LIKE', '%'.$keyword.'%')
+                                    ->get());
+    }
+}
+```
+    
 
 
 

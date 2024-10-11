@@ -1613,8 +1613,88 @@ public function register() {
 }
 ```
 
+# Visitor
 
+Visitor is a behavioral design pattern that lets you separate algorithms from the objects on which they operate.
 
+![alt text](image-17.png)
+
+## Application
+
+### Use the Visitor when you need to perform an operation on all elements of a complex object structure (for example, an object tree).
+
+### Use the Visitor to clean up the business logic of auxiliary behaviors.
+
+### Use the pattern when a behavior makes sense only in some classes of a class hierarchy, but not in others
+
+```php
+namespace Src\AbstractVisitor;
+
+interface Component {
+    public function accept(Visitor $visitor);
+}
+```
+
+```php
+namespace Src\AbstractVisitor;
+
+class ComponentA implements Component {
+    public function accept(Visitor $visitor) {
+        $visitor->visitComponentA($this);
+    }
+}
+```
+```php
+namespace Src\AbstractVisitor;
+
+class ComponentB implements Component {
+    public function accept(Visitor $visitor) {
+        $visitor->visitComponentB($this);
+    }
+}
+```
+
+```php
+namespace Src\AbstractVisitor;
+
+class ComponentC implements Component {
+    public function accept(Visitor $visitor) {
+       $visitor->visitComponentC($this);
+    }
+}
+```
+
+```php
+namespace Src\AbstractVisitor;
+
+interface Visitor {
+    public function visitComponentA(ComponentA $componentA);
+    public function visitComponentB(ComponentB $componentB);
+    public function visitComponentC(ComponentC $componentC);
+}
+```
+
+```php
+namespace Src\AbstractVisitor;
+
+class Algorithm implements Visitor
+{
+    public function visitComponentA(ComponentA $componentA)
+    {
+        // TODO: Implement visitComponentA() method.
+    }
+
+    public function visitComponentB(ComponentB $componentB)
+    {
+        // TODO: Implement visitComponentB() method.
+    }
+
+    public function visitComponentC(ComponentC $componentC)
+    {
+        // TODO: Implement visitComponentC() method.
+    }
+}
+```
     
 
 

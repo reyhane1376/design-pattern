@@ -3,9 +3,6 @@
 Factory Method is a creational design pattern that provides an interface for creating objects in a superclass, but allows subclasses to alter the type of objects that will be created.
 
 
-![alt text](image.png)
-
-
 
 ## Applicability
 
@@ -92,7 +89,6 @@ public function register()
 
 Abstract Factory is a creational design pattern that lets you produce families of related objects without specifying their concrete classes.
 
-![alt text](image-1.png)
 
 ## Application
 
@@ -244,7 +240,6 @@ public function register()
 
 Builder is a creational design pattern that lets you construct complex objects step by step. The pattern allows you to produce different types and representations of an object using the same construction code.
 
-![alt text](image-2.png)
 
 ## Application
 
@@ -396,7 +391,6 @@ class ApiService
 
 Adapter is a structural design pattern that allows objects with incompatible interfaces to collaborate.
 
-![alt text](image-3.png)
 
 ## Application
 
@@ -494,7 +488,6 @@ class SamanGatewayAdapter implements OnlineGateway
 
 Bridge is a structural design pattern that lets you split a large class or a set of closely related classes into two separate hierarchies—abstraction and implementation—which can be developed independently of each other.
 
-![alt text](image-4.png)
 
 ## Application
 
@@ -583,7 +576,6 @@ public function register()
 
 Composite is a structural design pattern that lets you compose objects into tree structures and then work with these structures as if they were individual objects.
 
-![alt text](image-5.png)
 
 ## Application
 
@@ -653,7 +645,6 @@ class Client
 
 Decorator is a structural design pattern that lets you attach new behaviors to objects by placing these objects inside special wrapper objects that contain the behaviors..
 
-![alt text](image-6.png)
 
 ## Application
 
@@ -733,7 +724,6 @@ class InvoiceService {
 
 Facade is a structural design pattern that provides a simplified interface to a library, a framework, or any other complex set of classes.
 
-![alt text](image-7.png)
 
 ## Application
 
@@ -818,7 +808,6 @@ class Basket {
 
 Flyweight is a structural design pattern that lets you fit more objects into the available amount of RAM by sharing common parts of state between multiple objects instead of keeping all of the data in each object.
 
-![alt text](image-8.png)
 
 ## Application
 
@@ -938,7 +927,6 @@ class Client {
 
 Proxy is a structural design pattern that lets you provide a substitute or placeholder for another object. A proxy controls access to the original object, allowing you to perform something either before or after the request gets through to the original object.
 
-![alt text](image-9.png)
 
 ## Application
 
@@ -995,7 +983,6 @@ class CachedProductRepository implements ProductRepositoryInterface {
 
 Chain of Responsibility is a behavioral design pattern that lets you pass requests along a chain of handlers. Upon receiving a request, each handler decides either to process the request or to pass it to the next handler in the chain.
 
-![alt text](image-10.png)
 
 ## Application
 
@@ -1107,7 +1094,6 @@ class RegistrationService {
 
 Strategy is a behavioral design pattern that lets you define a family of algorithms, put each of them into a separate class, and make their objects interchangeable.
 
-![alt text](image-11.png)
 
 ## Application
 
@@ -1194,7 +1180,6 @@ class PaymentsController extends Controller {
 
 Observer is a behavioral design pattern that lets you define a subscription mechanism to notify multiple objects about any events that happen to the object they're observing
 
-![alt text](image-12.png)
 
 ## Application
 
@@ -1259,7 +1244,6 @@ class ProductOfferProductPriceObserver implements \SplObserver {
 
 State is a behavioral design pattern that lets an object alter its behavior when its internal state changes. It appears as if the object changed its class.
 
-![alt text](image-13.png)
 
 ## Application
 
@@ -1389,7 +1373,6 @@ class Client {
 
 Template Method is a behavioral design pattern that defines the skeleton of an algorithm in the superclass but lets subclasses override specific steps of the algorithm without changing its structure.
 
-![alt text](image-14.png)
 
 ## Application
 
@@ -1457,7 +1440,6 @@ class Client {
 
 Command is a behavioral design pattern that turns a request into a stand-alone object that contains all information about the request. This transformation lets you parameterize methods with different requests, delay or queue a request's execution, and support undoable operations.
 
-![alt text](image-15.png)
 
 ## Application
 
@@ -1533,7 +1515,6 @@ interface UndoableCommand extends Command {
 
 Mediator is a behavioral design pattern that lets you reduce chaotic dependencies between objects. The pattern restricts direct communications between the objects and forces them to collaborate only via a mediator object.
 
-![alt text](image-16.png)
 
 ## Application
 
@@ -1617,7 +1598,6 @@ public function register() {
 
 Visitor is a behavioral design pattern that lets you separate algorithms from the objects on which they operate.
 
-![alt text](image-17.png)
 
 ## Application
 
